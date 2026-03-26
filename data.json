@@ -711,6 +711,15 @@
       "leadTime": "50",
       "estado": "Entregado",
       "obs": ""
+    },
+    {
+      "descripcion": "Transformador de potencia",
+      "proveedor": "asd",
+      "fechaNecesaria": "2026-07-09",
+      "fechaLlegada": "2026-09-09",
+      "leadTime": "20",
+      "estado": "En aduana",
+      "obs": "asd"
     }
   ],
   "diasAlerta": 15

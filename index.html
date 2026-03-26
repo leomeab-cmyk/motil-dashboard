@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Control de Obra — MOTIL · C MEJIA S.A.C.</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* COLORES CORPORATIVOS C MEJIA SAC */
+    --navy:    #1a2b4a;   /* azul marino oscuro logo */
+    --blue:    #2e6da4;   /* azul medio */
+    --steel:   #5b8ab8;   /* azul acero claro */
+    --skyblue: #c8ddf0;   /* azul muy claro */
+    --bg:      #f0f4f8;   /* fondo gris azulado */
+    --white:   #ffffff;
+    --surface: #ffffff;
+    --surface2:#f7f9fc;
+    --border:  #dde5ef;
+    --border2: #c5d4e4;
+
+    /* textos */
+    --text:    #1a2b4a;
+    --text2:   #4a6080;
+    --text3:   #7a92a8;
+
+    /* semáforos */
+    --green:   #1a7a4a;
+    --green-bg:#e6f5ee;
+    --warn:    #b36a00;
+    --warn-bg: #fff3e0;
+    --danger:  #c0392b;
+    --danger-bg:#fdecea;
+    --purple:  #5b4fcf;
+    --purple-bg:#eeecfb;
+
+    /* líneas curva */
+    --planif:  #2e6da4;
+    --real:    #1a7a4a;
+    --contract:#b36a00;
+    --forecast:#9b59b6;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:13px;min-height:100vh}
+
+  /* ── HEADER ── */
+  .header{
+    background:var(--navy);
+    padding:0 28px;
+    display:flex;align-items:center;justify-content:space-between;
+    height:64px;
+    box-shadow:0 2px 12px rgba(26,43,74,.25);
+    position:sticky;top:0;z-index:100;
+  }
+  .hdr-left{display:flex;align-items:center;gap:16px}
+  .logo-wrap{
+    background:white;border-radius:6px;
+    padding:4px 10px;
+    display:flex;align-items:center;gap:6px;
+    height:44px;
+  }
+  .logo-diamond{
+    width:28px;height:28px;
+    background:linear-gradient(135deg,var(--blue),var(--steel));
+    clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%);
+    flex-shrink:0;
+  }
+  .logo-text{font-family:'Inter',sans-serif;font-size:11px;font-weight:800;color:var(--navy);letter-spacing:.3px;line-height:1.2}
+  .logo-sub{font-size:8.5px;font-weight:500;color:var(--text2);letter-spacing:.5px;text-transform:uppercase}
+  .divider{width:1px;height:36px;background:rgba(255,255,255,.2)}
+  .project-info{color:white}
+  .pname{font-size:16px;font-weight:700;letter-spacing:-.3px}
+  .psub{font-size:10px;color:rgba(255,255,255,.6);letter-spacing:.5px;text-transform:uppercase}
+  .hdr-right{display:flex;align-items:center;gap:14px}
+  .hdr-badge{
+    background:rgba(255,255,255,.1);
+    border:1px solid rgba(255,255,255,.2);
+    border-radius:8px;padding:7px 13px;text-align:center;
+    color:white;
+  }
+  .hb-label{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;opacity:.7}
+  .hb-val{font-size:18px;font-weight:800;line-height:1.1}
+  .hb-unit{font-size:9px;opacity:.6}
+  .sem-badge{background:var(--blue);border-radius:7px;padding:7px 13px;text-align:center;color:white}
+  .sb-label{font-size:9px;text-transform:uppercase;letter-spacing:1px;opacity:.7}
+  .sb-val{font-size:18px;font-weight:800}
+  .live{display:flex;align-items:center;gap:5px;font-size:10px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:1px}
+  .ldot{width:7px;height:7px;border-radius:50%;background:#4ccd7f;animation:pulse 1.5s infinite;display:inline-block}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
+
+  /* ── NAV TABS ── */
+  .nav{
+    background:var(--white);
+    border-bottom:1px solid var(--border);
+    display:flex;padding:0 28px;
+    overflow-x:auto;
+    box-shadow:0 1px 4px rgba(26,43,74,.06);
+  }
+  .tab{
+    padding:12px 18px;background:none;border:none;
+    border-bottom:2.5px solid transparent;
+    color:var(--text2);font-family:'Inter',sans-serif;
+    font-size:11.5px;font-weight:500;letter-spacing:.3px;
+    cursor:pointer;white-space:nowrap;transition:all .18s;
+  }
+  .tab:hover{color:var(--navy)}
+  .tab.active{color:var(--blue);border-bottom-color:var(--blue);font-weight:600}
+  .tc{display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;border-radius:50%;background:var(--danger);color:#fff;font-size:9px;margin-left:5px;font-weight:700}
+
+  /* ── LAYOUT ── */
+  .main{padding:22px 28px;max-width:1600px}
+  .sec{display:none}
+  .sec.active{display:block}
+
+  /* ── KPI CARDS ── */
+  .krow{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px}
+  .kcard{
+    background:var(--white);border:1px solid var(--border);
+    border-radius:10px;padding:16px;
+    border-top:3px solid var(--ac,var(--blue));
+    box-shadow:0 1px 4px rgba(26,43,74,.06);
+  }
+  .klbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text2);margin-bottom:6px}
+  .kval{font-size:26px;font-weight:800;color:var(--vc,var(--navy));line-height:1}
+  .ksub{font-size:10px;color:var(--text3);margin-top:5px}
+  .kdelta{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;margin-top:6px}
+  .dp{background:var(--green-bg);color:var(--green)}
+  .dn{background:var(--danger-bg);color:var(--danger)}
+  .dw{background:var(--warn-bg);color:var(--warn)}
+  .di{background:var(--skyblue);color:var(--blue)}
+
+  /* ── CARD ── */
+  .card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:16px;box-shadow:0 1px 4px rgba(26,43,74,.05)}
+  .ctitle{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--navy);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .ctitle-line{display:flex;align-items:center;gap:8px}
+  .ctitle-line::before{content:'';width:3px;height:16px;background:var(--blue);border-radius:2px;flex-shrink:0}
+  .cbadge{font-size:9px;font-family:'DM Mono',monospace;padding:3px 8px;border-radius:20px;background:var(--skyblue);color:var(--blue);font-weight:600}
+
+  /* ── GRIDS ── */
+  .g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+  .g12{display:grid;grid-template-columns:1fr 2fr;gap:14px;margin-bottom:16px}
+  .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:16px}
+
+  /* ── LEGEND ── */
+  .lgnd{display:flex;gap:14px;margin-bottom:12px;flex-wrap:wrap}
+  .li{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2);font-weight:500}
+  .ld{width:12px;height:4px;border-radius:2px}
+
+  /* ── PROGRESS BARS ── */
+  .pg{margin-bottom:13px}
+  .ph{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+  .pn{font-size:11.5px;color:var(--text);font-weight:500;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .pcomp{display:flex;gap:5px;align-items:center}
+  .pc{font-size:10px;padding:2px 7px;border-radius:20px;font-weight:600}
+  .ccont{background:var(--warn-bg);color:var(--warn)}
+  .cplan{background:var(--skyblue);color:var(--blue)}
+  .creal{background:var(--green-bg);color:var(--green)}
+
+  .ptrack{position:relative;height:15px;background:var(--bg);border-radius:4px;overflow:hidden;border:1px solid var(--border)}
+  .pbar{position:absolute;border-radius:3px;transition:width .8s cubic-bezier(.4,0,.2,1)}
+
+  /* ── TABLE ── */
+  .tbl{width:100%;border-collapse:collapse;font-size:12px}
+  .tbl th{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--text2);padding:8px 10px;text-align:left;border-bottom:2px solid var(--border);background:var(--surface2)}
+  .tbl td{padding:9px 10px;border-bottom:1px solid var(--border);vertical-align:middle;color:var(--text)}
+  .tbl tr:hover td{background:var(--bg)}
+  .tbl tr:last-child td{border-bottom:none}
+  .tbl-sec td{background:var(--skyblue)!important;color:var(--navy);font-weight:700;font-size:10.5px;text-transform:uppercase;letter-spacing:.5px}
+
+  /* ── BADGES ── */
+  .badge{display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:20px;font-size:10px;font-weight:600;white-space:nowrap}
+  .bok{background:var(--green-bg);color:var(--green)}
+  .bwarn{background:var(--warn-bg);color:var(--warn)}
+  .bdanger{background:var(--danger-bg);color:var(--danger)}
+  .binfo{background:var(--skyblue);color:var(--blue)}
+  .bneut{background:var(--surface2);color:var(--text2)}
+
+  /* ── ALERT BANNERS ── */
+  .abanner{
+    background:var(--danger-bg);border:1px solid #f5c6c2;
+    border-left:4px solid var(--danger);
+    border-radius:8px;padding:11px 14px;margin-bottom:9px;
+    display:flex;align-items:flex-start;gap:10px;
+    animation:sin .3s ease;
+  }
+  @keyframes sin{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+  .atitle{font-size:12px;font-weight:700;color:var(--danger);margin-bottom:2px}
+  .adesc{font-size:11px;color:var(--text2)}
+  .adays{font-size:10px;color:var(--warn);margin-top:3px;font-weight:600}
+
+  /* ── RESTRICCION CARDS ── */
+  .rcard{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:13px;margin-bottom:9px;border-left:4px solid var(--border);box-shadow:0 1px 3px rgba(26,43,74,.05)}
+  .rcard.crit{border-left-color:var(--danger)}
+  .rcard.nocrit{border-left-color:var(--warn)}
+  .rcard.cerr{border-left-color:var(--green);opacity:.75}
+  .rid{font-size:9px;color:var(--text3);margin-bottom:2px;text-transform:uppercase;letter-spacing:1px;font-weight:600}
+  .rtitle{font-size:12.5px;font-weight:600;color:var(--navy)}
+  .rmeta{display:flex;gap:14px;margin-top:6px;flex-wrap:wrap}
+  .rmi{font-size:10.5px;color:var(--text2)}
+  .rmi span{color:var(--text);font-weight:500}
+  .robs{font-size:10.5px;color:var(--text2);margin-top:7px;background:var(--bg);padding:6px 8px;border-radius:5px;border-left:2px solid var(--border2)}
+  .rhdr{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px}
+
+  /* ── MODAL ── */
+  .movl{display:none;position:fixed;inset:0;background:rgba(26,43,74,.45);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
+  .movl.open{display:flex}
+  .modal{background:var(--white);border-radius:12px;padding:26px;width:500px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(26,43,74,.2)}
+  .mtitle{font-size:16px;font-weight:700;color:var(--navy);margin-bottom:18px}
+  .flbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--text2);margin-bottom:4px;display:block}
+  .finp,.fsel,.ftxt{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:7px;padding:9px 12px;color:var(--text);font-family:'Inter',sans-serif;font-size:12px;outline:none;transition:border-color .2s}
+  .finp:focus,.fsel:focus,.ftxt:focus{border-color:var(--blue);background:var(--white)}
+  .ftxt{resize:vertical;min-height:70px}
+  .fr{margin-bottom:12px}
+  .fr2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .btn{padding:9px 18px;border-radius:7px;border:none;font-family:'Inter',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s}
+  .bprimary{background:var(--blue);color:white}
+  .bprimary:hover{background:var(--navy)}
+  .bsec{background:var(--bg);color:var(--text);border:1.5px solid var(--border)}
+  .bsec:hover{border-color:var(--blue);color:var(--blue)}
+  .bdel{background:var(--danger-bg);color:var(--danger);border:1px solid #f5c6c2;font-size:10px;padding:3px 9px;border-radius:5px;cursor:pointer;font-weight:600}
+  .bsm{padding:5px 12px;font-size:11px}
+  .mfooter{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
+  .addbtn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:7px;background:var(--blue);color:white;font-size:11px;font-family:'Inter',sans-serif;font-weight:600;cursor:pointer;transition:all .15s;border:none}
+  .addbtn:hover{background:var(--navy)}
+
+  /* ── SECTION DIVIDERS ── */
+  .sec-header{
+    font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;
+    color:var(--blue);margin:16px 0 9px;padding:5px 10px;
+    background:var(--skyblue);border-radius:5px;
+    border-left:3px solid var(--blue);
+  }
+
+  /* ── CHART WRAP ── */
+  .chw{position:relative;height:210px}
+
+  /* ── COUNTDOWN HIGHLIGHT ── */
+  .cnt-danger{color:#e74c3c!important}
+  .cnt-warn{color:var(--warn)!important}
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar{width:5px;height:5px}
+  ::-webkit-scrollbar-track{background:var(--bg)}
+  ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+  /* ── PRINT / GERENCIA FOOTER ── */
+  .footer{
+    background:var(--white);border-top:1px solid var(--border);
+    padding:10px 28px;display:flex;align-items:center;justify-content:space-between;
+    font-size:10px;color:var(--text3);
+  }
+
+  @media(max-width:860px){
+    .main{padding:12px}
+    .g2,.g12,.g3{grid-template-columns:1fr}
+    .header{padding:0 14px;height:auto;padding:10px 14px;flex-wrap:wrap;gap:8px}
+  }
+  @media print{
+    .nav,.addbtn,.bdel,.movl{display:none!important}
+    .sec{display:block!important}
+    body{background:white}
+    .card,.kcard,.rcard{box-shadow:none;border-color:#ccc}
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<div class="header">
+  <div class="hdr-left">
+    <div class="logo-wrap">
+      <div class="logo-diamond"></div>
+      <div>
+        <div class="logo-text">C MEJIA S.A.C.</div>
+        <div class="logo-sub">Contratistas Generales</div>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="project-info">
+      <div class="pname">PROYECTO MOTIL</div>
+      <div class="psub">S.E. Motil · Control de Avance de Obra</div>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <div class="sem-badge">
+      <div class="sb-label">Semana</div>
+      <div class="sb-val">S17</div>
+    </div>
+    <div class="hdr-badge">
+      <div class="hb-label">Inicio</div>
+      <div class="hb-val" style="font-size:13px;font-weight:700">14/11/25</div>
+    </div>
+    <div class="hdr-badge">
+      <div class="hb-label">Fin Contractual</div>
+      <div class="hb-val" style="font-size:13px;font-weight:700">07/01/27</div>
+    </div>
+    <div class="hdr-badge">
+      <div class="hb-label">Días restantes</div>
+      <div class="hb-val" id="drest">—</div>
+      <div class="hb-unit">días</div>
+    </div>
+    <div class="live"><div class="ldot"></div>LIVE</div>
+  </div>
+</div>
+
+<!-- ══ TABS ══ -->
+<div class="nav">
+  <button class="tab active" onclick="showTab('resumen',this)">📊 Resumen Ejecutivo</button>
+  <button class="tab" onclick="showTab('avance',this)">🏗️ Avance de Obra</button>
+  <button class="tab" onclick="showTab('curvas',this)">📈 Curva S</button>
+  <button class="tab" onclick="showTab('sum',this)">📦 Suministros <span class="tc" id="alertCount">0</span></button>
+  <button class="tab" onclick="showTab('rest',this)">⚠️ Restricciones</button>
+  <button class="tab" onclick="showTab('cfg',this)">⚙️ Configuración</button>
+</div>
+
+<div class="main">
+
+<!-- ══════════ RESUMEN EJECUTIVO ══════════ -->
+<div class="sec active" id="sec-resumen">
+
+  <div class="krow">
+    <div class="kcard" style="--ac:var(--green)">
+      <div class="klbl">Avance Real Acum.</div>
+      <div class="kval" style="--vc:var(--green)">8.55%</div>
+      <div class="ksub">SEM17 · 16/03/2026</div>
+      <div class="kdelta di">= Plan · Sin desviación</div>
+    </div>
+    <div class="kcard" style="--ac:var(--blue)">
+      <div class="klbl">Avance Planificado</div>
+      <div class="kval">8.55%</div>
+      <div class="ksub">Prog. acumulado S17</div>
+      <div class="kdelta di">Δ = 0.00%</div>
+    </div>
+    <div class="kcard" style="--ac:var(--warn)">
+      <div class="klbl">Avance Contractual</div>
+      <div class="kval" style="--vc:var(--warn)">2.08%</div>
+      <div class="ksub">Baseline original</div>
+      <div class="kdelta dp">▲ +6.47% adelantado</div>
+    </div>
+    <div class="kcard" style="--ac:var(--navy)">
+      <div class="klbl">Valor Contrato Total</div>
+      <div class="kval" style="font-size:18px;--vc:var(--navy)">$3.09M</div>
+      <div class="ksub">USD 3,090,285.88</div>
+      <div class="kdelta di">3 Frentes de Trabajo</div>
+    </div>
+    <div class="kcard" style="--ac:var(--danger)">
+      <div class="klbl">Alertas Suministros</div>
+      <div class="kval" style="--vc:var(--danger)" id="k-al">0</div>
+      <div class="ksub">Ítems en riesgo</div>
+    </div>
+    <div class="kcard" style="--ac:var(--warn)">
+      <div class="klbl">Restricciones Abiertas</div>
+      <div class="kval" style="--vc:var(--warn)" id="k-rest">0</div>
+      <div class="ksub">Pendientes de atención</div>
+    </div>
+  </div>
+
+  <!-- COMPARATIVO Plan vs Real vs Contractual -->
+  <div class="card" style="margin-bottom:16px">
+    <div class="ctitle">
+      <div class="ctitle-line">Comparativo de Avance — SEM17</div>
+      <span class="cbadge">Contractual · Planificado · Real</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:16px">
+      <!-- Contractual -->
+      <div style="padding:16px 18px;border-right:1px solid var(--border);background:var(--warn-bg)">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--warn);margin-bottom:6px">Contractual (Baseline)</div>
+        <div style="font-size:32px;font-weight:800;color:var(--warn);line-height:1">2.08%</div>
+        <div style="font-size:10px;color:var(--text2);margin-top:5px">Avance original de contrato</div>
+        <div style="margin-top:10px;height:6px;background:rgba(179,106,0,.15);border-radius:3px;overflow:hidden">
+          <div style="height:100%;width:2.08%;background:var(--warn);border-radius:3px"></div>
+        </div>
+      </div>
+      <!-- Planificado -->
+      <div style="padding:16px 18px;border-right:1px solid var(--border);background:var(--skyblue)">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--blue);margin-bottom:6px">Planificado (Plan Trabajo)</div>
+        <div style="font-size:32px;font-weight:800;color:var(--blue);line-height:1">8.55%</div>
+        <div style="font-size:10px;color:var(--text2);margin-top:5px">Prog. acumulado esperado S17</div>
+        <div style="margin-top:10px;height:6px;background:rgba(46,109,164,.15);border-radius:3px;overflow:hidden">
+          <div style="height:100%;width:8.55%;background:var(--blue);border-radius:3px"></div>
+        </div>
+      </div>
+      <!-- Real -->
+      <div style="padding:16px 18px;background:var(--green-bg)">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--green);margin-bottom:6px">Real Ejecutado</div>
+        <div style="font-size:32px;font-weight:800;color:var(--green);line-height:1">8.55%</div>
+        <div style="font-size:10px;color:var(--text2);margin-top:5px">Avance físico real S17</div>
+        <div style="margin-top:10px;height:6px;background:rgba(26,122,74,.15);border-radius:3px;overflow:hidden">
+          <div style="height:100%;width:8.55%;background:var(--green);border-radius:3px"></div>
+        </div>
+      </div>
+    </div>
+    <!-- Diferencias -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+      <div style="background:var(--green-bg);border:1px solid #b7e4c7;border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:12px">
+        <div style="font-size:24px">📈</div>
+        <div>
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--green)">Real vs Planificado</div>
+          <div style="font-size:20px;font-weight:800;color:var(--green)">0.00%</div>
+          <div style="font-size:10px;color:var(--text2)">Sin desviación — al día con el plan</div>
+        </div>
+      </div>
+      <div style="background:var(--green-bg);border:1px solid #b7e4c7;border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:12px">
+        <div style="font-size:24px">🏆</div>
+        <div>
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--green)">Real vs Contractual</div>
+          <div style="font-size:20px;font-weight:800;color:var(--green)">+6.47%</div>
+          <div style="font-size:10px;color:var(--text2)">Adelantado respecto al baseline</div>
+        </div>
+      </div>
+    </div>
+    <!-- Tabla comparativa por frente -->
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text2);margin-bottom:8px">Comparativo por Frente de Trabajo</div>
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th>Frente de Trabajo</th>
+          <th style="text-align:right;color:var(--warn)">Contractual</th>
+          <th style="text-align:right;color:var(--blue)">Planificado</th>
+          <th style="text-align:right;color:var(--green)">Real</th>
+          <th style="text-align:right">Δ Real−Plan</th>
+          <th style="text-align:right">Δ Real−Contrato</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="font-weight:600">Obras Civiles — Patio de Llaves</td>
+          <td style="text-align:right;color:var(--warn);font-weight:600;font-family:'DM Mono',monospace">16.0%</td>
+          <td style="text-align:right;color:var(--blue);font-weight:600;font-family:'DM Mono',monospace">18.1%</td>
+          <td style="text-align:right;color:var(--green);font-weight:700;font-family:'DM Mono',monospace">18.1%</td>
+          <td style="text-align:right;font-family:'DM Mono',monospace"><span class="badge bok">0.0%</span></td>
+          <td style="text-align:right;font-family:'DM Mono',monospace"><span class="badge bok">+2.1%</span></td>
+          <td><span class="badge bok">En marcha</span></td>
+        </tr>
+        <tr>
+          <td style="font-weight:600">Obras Civiles — Sala de Control</td>
+          <td style="text-align:right;color:var(--warn);font-weight:600;font-family:'DM Mono',monospace">0.0%</td>
+          <td style="text-align:right;color:var(--blue);font-weight:600;font-family:'DM Mono',monospace">0.0%</td>
+          <td style="text-align:right;color:var(--text2);font-family:'DM Mono',monospace">0.0%</td>
+          <td style="text-align:right"><span class="badge bneut">—</span></td>
+          <td style="text-align:right"><span class="badge bneut">—</span></td>
+          <td><span class="badge bneut">Pendiente inicio</span></td>
+        </tr>
+        <tr>
+          <td style="font-weight:600">Obras Electromecánicas</td>
+          <td style="text-align:right;color:var(--warn);font-weight:600;font-family:'DM Mono',monospace">0.0%</td>
+          <td style="text-align:right;color:var(--blue);font-weight:600;font-family:'DM Mono',monospace">4.1%</td>
+          <td style="text-align:right;color:var(--green);font-weight:700;font-family:'DM Mono',monospace">4.1%</td>
+          <td style="text-align:right"><span class="badge bok">0.0%</span></td>
+          <td style="text-align:right"><span class="badge bok">+4.1%</span></td>
+          <td><span class="badge bok">En marcha</span></td>
+        </tr>
+        <tr>
+          <td style="font-weight:600">Redes Primarias</td>
+          <td style="text-align:right;color:var(--warn);font-weight:600;font-family:'DM Mono',monospace">0.0%</td>
+          <td style="text-align:right;color:var(--blue);font-weight:600;font-family:'DM Mono',monospace">6.4%</td>
+          <td style="text-align:right;color:var(--green);font-weight:700;font-family:'DM Mono',monospace">6.4%</td>
+          <td style="text-align:right"><span class="badge bok">0.0%</span></td>
+          <td style="text-align:right"><span class="badge bok">+6.4%</span></td>
+          <td><span class="badge bok">En marcha</span></td>
+        </tr>
+        <tr style="background:var(--navy);color:white">
+          <td style="font-weight:800;color:white">TOTAL PROYECTO</td>
+          <td style="text-align:right;font-weight:800;font-family:'DM Mono',monospace;color:#ffcc00">2.08%</td>
+          <td style="text-align:right;font-weight:800;font-family:'DM Mono',monospace;color:#90caf9">8.55%</td>
+          <td style="text-align:right;font-weight:800;font-family:'DM Mono',monospace;color:#a5d6a7">8.55%</td>
+          <td style="text-align:right"><span class="badge bok" style="background:rgba(124,252,94,.2)">0.00%</span></td>
+          <td style="text-align:right"><span class="badge bok" style="background:rgba(124,252,94,.2)">+6.47%</span></td>
+          <td><span class="badge bok" style="background:rgba(124,252,94,.2)">✓ Al día</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="g12">
+    <!-- Curva S mini -->
+    <div class="card">
+      <div class="ctitle">
+        <div class="ctitle-line">Curva S — S01 a S17</div>
+        <span class="cbadge">Avance Acumulado %</span>
+      </div>
+      <div class="lgnd">
+        <div class="li"><div class="ld" style="background:var(--planif)"></div>Planificado</div>
+        <div class="li"><div class="ld" style="background:var(--real)"></div>Real</div>
+      </div>
+      <div class="chw"><canvas id="cResumen"></canvas></div>
+    </div>
+    <!-- Alertas -->
+    <div class="card">
+      <div class="ctitle"><div class="ctitle-line">🚨 Alertas Activas de Suministros</div><button class="addbtn bsm" onclick="showTab('sum',null)">Ver todos →</button></div>
+      <div id="al-res"><div style="color:var(--text2);font-size:12px;text-align:center;padding:18px;background:var(--bg);border-radius:7px">Sin alertas activas. Agrega suministros para monitoreo automático.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ AVANCE OBRA ══════════ -->
+<div class="sec" id="sec-avance">
+
+  <div class="card">
+    <div class="ctitle">
+      <div class="ctitle-line">Avance por Frente de Trabajo — SEM17</div>
+      <span class="cbadge">Contractual / Planificado / Real</span>
+    </div>
+    <div class="lgnd">
+      <div class="li"><div class="ld" style="background:var(--contract)"></div>Contractual</div>
+      <div class="li"><div class="ld" style="background:var(--planif)"></div>Planificado</div>
+      <div class="li"><div class="ld" style="background:var(--real)"></div>Real</div>
+    </div>
+    <div class="sec-header">📍 OBRAS CIVILES — PATIO DE LLAVES</div>
+    <div id="bars-civiles"></div>
+    <div class="sec-header">📍 OBRAS CIVILES — SALA DE CONTROL</div>
+    <div style="color:var(--text2);font-size:11.5px;padding:8px 12px;background:var(--bg);border-radius:6px;border-left:3px solid var(--border2)">Sin avance en SEM17. Actividades pendientes de inicio: Obras Provisionales, Obras Preliminares, Mov. de Tierras, Garita de Control, Pozo Séptico, Muro de Contención, Sistema de Drenaje.</div>
+    <div class="sec-header">⚡ OBRAS ELECTROMECANICAS</div>
+    <div id="bars-electro"></div>
+    <div class="sec-header">🔌 REDES PRIMARIAS</div>
+    <div id="bars-rp"></div>
+  </div>
+
+  <!-- Tabla detalle -->
+  <div class="card">
+    <div class="ctitle"><div class="ctitle-line">Tabla Detalle de Actividades — SEM17</div></div>
+    <div style="overflow-x:auto">
+      <table class="tbl">
+        <thead><tr>
+          <th>IT</th><th>Frente</th><th>Actividad</th>
+          <th>Contractual</th><th>Plan S17</th><th>Real S17</th>
+          <th>Δ vs Plan</th><th>Venta (USD)</th>
+        </tr></thead>
+        <tbody id="tbody-act"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ CURVA S ══════════ -->
+<div class="sec" id="sec-curvas">
+  <div class="card">
+    <div class="ctitle">
+      <div class="ctitle-line">Curva S Completa — S01 a S62</div>
+      <span class="cbadge">Planif. + Real + Forecast</span>
+    </div>
+    <div class="lgnd">
+      <div class="li"><div class="ld" style="background:var(--planif)"></div>Planificado</div>
+      <div class="li"><div class="ld" style="background:var(--real)"></div>Real (hasta S17)</div>
+      <div class="li"><div class="ld" style="background:var(--forecast);opacity:.8"></div>Forecast S17→Fin</div>
+    </div>
+    <div style="height:340px;position:relative"><canvas id="cFull"></canvas></div>
+  </div>
+  <div class="card">
+    <div class="ctitle"><div class="ctitle-line">Datos Semanales</div></div>
+    <div style="overflow-x:auto;max-height:400px;overflow-y:auto">
+      <table class="tbl" id="tbl-curva"></table>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ SUMINISTROS ══════════ -->
+<div class="sec" id="sec-sum">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+    <div>
+      <div style="font-size:16px;font-weight:700;color:var(--navy)">Seguimiento de Suministros</div>
+      <div style="font-size:11px;color:var(--text2);margin-top:2px">Monitoreo automático de fechas críticas para montaje</div>
+    </div>
+    <button class="addbtn" onclick="openM('mSum')">+ Nuevo Suministro</button>
+  </div>
+  <div id="al-sum" style="margin-bottom:12px"></div>
+  <div class="card">
+    <div class="ctitle"><div class="ctitle-line">Registro de Suministros</div></div>
+    <div style="overflow-x:auto">
+      <table class="tbl">
+        <thead><tr><th>#</th><th>Descripción</th><th>Proveedor</th><th>Nec. en Obra</th><th>Est. Llegada</th><th>Estado</th><th>Alerta</th><th></th></tr></thead>
+        <tbody id="tbody-sum"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ RESTRICCIONES ══════════ -->
+<div class="sec" id="sec-rest">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+    <div>
+      <div style="font-size:16px;font-weight:700;color:var(--navy)">Gestión de Restricciones</div>
+      <div style="font-size:11px;color:var(--text2);margin-top:2px">Control de impedimentos técnicos, administrativos y logísticos</div>
+    </div>
+    <button class="addbtn" onclick="openM('mRest')">+ Nueva Restricción</button>
+  </div>
+  <div class="krow" style="grid-template-columns:repeat(4,1fr);margin-bottom:14px">
+    <div class="kcard" style="--ac:var(--danger)"><div class="klbl">Críticas Abiertas</div><div class="kval" style="--vc:var(--danger)" id="rc-crit">0</div></div>
+    <div class="kcard" style="--ac:var(--warn)"><div class="klbl">No Críticas Abiertas</div><div class="kval" style="--vc:var(--warn)" id="rc-nc">0</div></div>
+    <div class="kcard" style="--ac:var(--green)"><div class="klbl">Cerradas</div><div class="kval" style="--vc:var(--green)" id="rc-cerr">0</div></div>
+    <div class="kcard"><div class="klbl">Total Registradas</div><div class="kval" id="rc-tot">0</div></div>
+  </div>
+  <div id="rest-cont"><div style="color:var(--text2);text-align:center;padding:40px;background:var(--bg);border-radius:8px;font-size:12px">Sin restricciones registradas. Haz clic en "+ Nueva Restricción".</div></div>
+</div>
+
+<!-- ══════════ CONFIGURACIÓN ══════════ -->
+<div class="sec" id="sec-cfg">
+  <div class="card">
+    <div class="ctitle"><div class="ctitle-line">Datos del Proyecto — RSP_MOTIL_SEM17.xlsx</div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+      <div><div class="flbl">Proyecto</div><div style="padding:9px 12px;background:var(--bg);border-radius:7px;font-size:12px;font-weight:500">MOTIL — Subestación Eléctrica Motil</div></div>
+      <div><div class="flbl">Empresa</div><div style="padding:9px 12px;background:var(--bg);border-radius:7px;font-size:12px;font-weight:500">C MEJIA S.A.C. — Contratistas Generales</div></div>
+      <div><div class="flbl">Semana de Reporte</div><div style="padding:9px 12px;background:var(--bg);border-radius:7px;font-size:12px;font-weight:500">SEM 17 (16–22 Mar 2026)</div></div>
+      <div><div class="flbl">Fecha Inicio Contractual</div><div style="padding:9px 12px;background:var(--bg);border-radius:7px;font-size:12px;font-weight:500">14/11/2025</div></div>
+      <div><div class="flbl">Fecha Fin Contractual</div><div style="padding:9px 12px;background:var(--danger-bg);border-radius:7px;font-size:12px;font-weight:700;color:var(--danger)">07/01/2027</div></div>
+      <div><div class="flbl">Valor Total Contrato</div><div style="padding:9px 12px;background:var(--skyblue);border-radius:7px;font-size:12px;font-weight:700;color:var(--blue)">USD $3,090,285.88</div></div>
+      <div><div class="flbl">Avance Plan vs Real S17</div><div style="padding:9px 12px;background:var(--green-bg);border-radius:7px;font-size:12px;font-weight:700;color:var(--green)">8.55% = 8.55% (Sin desviación)</div></div>
+      <div><div class="flbl">Diferencia vs Contractual</div><div style="padding:9px 12px;background:var(--green-bg);border-radius:7px;font-size:12px;font-weight:700;color:var(--green)">+6.47% adelantado</div></div>
+    </div>
+    <div style="display:flex;gap:9px;flex-wrap:wrap">
+      <button class="btn bprimary" onclick="expJSON()">📤 Exportar data.json</button>
+      <label class="btn bsec" style="cursor:pointer">📥 Importar JSON<input type="file" accept=".json" style="display:none" onchange="impJSON(event)"></label>
+      <button class="btn bsec" onclick="recargarServidor()">🔄 Recargar datos del servidor</button>
+      <button class="btn bsec" onclick="window.print()">🖨️ Imprimir / PDF</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ctitle"><div class="ctitle-line">Configuración de Alertas</div></div>
+    <div class="fr" style="max-width:300px">
+      <label class="flbl">Días de alerta anticipada (suministros)</label>
+      <input class="finp" type="number" id="cfg-da" value="15" min="1" oninput="saveST()">
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<!-- ══ FOOTER ══ -->
+<div class="footer">
+  <div>C MEJIA S.A.C. · Contratistas Generales · Dashboard de Control de Obra</div>
+  <div>Proyecto MOTIL · SEM17 · Generado: <span id="hoy-footer"></span></div>
+</div>
+
+<!-- ══ MODAL SUMINISTRO ══ -->
+<div class="movl" id="mSum">
+  <div class="modal">
+    <div class="mtitle">➕ Nuevo Suministro</div>
+    <div class="fr"><label class="flbl">Descripción del Suministro</label><input class="finp" id="s-desc" placeholder="Ej: Transformador de potencia 138/33kV"></div>
+    <div class="fr"><label class="flbl">Proveedor</label><input class="finp" id="s-prov" placeholder="Nombre del proveedor"></div>
+    <div class="fr2">
+      <div class="fr"><label class="flbl">Fecha Necesaria en Obra</label><input class="finp" type="date" id="s-fnec"></div>
+      <div class="fr"><label class="flbl">Fecha Estimada de Llegada</label><input class="finp" type="date" id="s-flleg"></div>
+    </div>
+    <div class="fr2">
+      <div class="fr"><label class="flbl">Lead Time (días)</label><input class="finp" type="number" id="s-lt" placeholder="60"></div>
+      <div class="fr"><label class="flbl">Estado Actual</label>
+        <select class="fsel" id="s-est"><option>En proceso</option><option>En tránsito</option><option>En aduana</option><option>Entregado</option><option>Pendiente OC</option></select>
+      </div>
+    </div>
+    <div class="fr"><label class="flbl">Observaciones</label><textarea class="ftxt" id="s-obs" placeholder="Notas adicionales..."></textarea></div>
+    <div class="mfooter"><button class="btn bsec" onclick="closeM('mSum')">Cancelar</button><button class="btn bprimary" onclick="addSum()">Guardar</button></div>
+  </div>
+</div>
+
+<!-- ══ MODAL RESTRICCION ══ -->
+<div class="movl" id="mRest">
+  <div class="modal">
+    <div class="mtitle">➕ Nueva Restricción</div>
+    <div class="fr"><label class="flbl">Descripción de la Restricción</label><input class="finp" id="r-desc" placeholder="Ej: Falta de planos IFC para inicio de cimentaciones"></div>
+    <div class="fr2">
+      <div class="fr"><label class="flbl">Responsable</label><input class="finp" id="r-resp" placeholder="Nombre o área"></div>
+      <div class="fr"><label class="flbl">Fecha de Atención</label><input class="finp" type="date" id="r-fecha"></div>
+    </div>
+    <div class="fr2">
+      <div class="fr"><label class="flbl">Tipo</label><select class="fsel" id="r-tipo"><option value="critica">Crítica</option><option value="no-critica">No Crítica</option></select></div>
+      <div class="fr"><label class="flbl">Estado</label><select class="fsel" id="r-est"><option value="abierta">Abierta</option><option value="en-proceso">En Proceso</option><option value="cerrada">Cerrada</option></select></div>
+    </div>
+    <div class="fr"><label class="flbl">Observaciones</label><textarea class="ftxt" id="r-obs" placeholder="Impacto, acciones tomadas, notas..."></textarea></div>
+    <div class="mfooter"><button class="btn bsec" onclick="closeM('mRest')">Cancelar</button><button class="btn bprimary" onclick="addRest()">Guardar</button></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+// ═══════════ DATOS CARGADOS DESDE data.json ═══════════
+let CS=[];
+let ACTS=[];
+
+// ═══════════ STATE ═══════════
+let ST={suministros:[],restricciones:[],diasAlerta:15};
+
+function loadST(fromServer){
+  if(!fromServer){
+    try{
+      const s=localStorage.getItem('motil_exec');
+      if(s){Object.assign(ST,JSON.parse(s));return;}
+    }catch(e){}
+  }
+  // Cargar desde data.json (estado publicado)
+  if(window._serverData){
+    ST.restricciones=(window._serverData.restricciones||[]).map(r=>({...r}));
+    ST.suministros=(window._serverData.suministros||[]).map(s=>({...s}));
+    ST.diasAlerta=window._serverData.diasAlerta||15;
+  }
+}
+function saveST(){ST.diasAlerta=parseInt(document.getElementById('cfg-da')?.value)||15;try{localStorage.setItem('motil_exec',JSON.stringify(ST));}catch(e){}}
+function recargarServidor(){
+  if(confirm('¿Recargar todos los datos desde el servidor?\nSe perderán los cambios locales no exportados.')){
+    localStorage.removeItem('motil_exec');
+    loadST(true);
+    renderSum();renderRest();
+    const da=document.getElementById('cfg-da');if(da)da.value=ST.diasAlerta;
+    alert('✅ Datos recargados desde el servidor.');
+  }
+}
+
+// ═══════════ INIT ═══════════
+window.addEventListener('DOMContentLoaded',()=>{
+  fetch('data.json?v='+Date.now())
+    .then(r=>r.json())
+    .then(data=>{
+      CS=data.CS||[];
+      ACTS=data.ACTS||[];
+      window._serverData=data;
+      initApp();
+    })
+    .catch(()=>{
+      window._serverData=null;
+      initApp();
+    });
+});
+
+function initApp(){
+  loadST();
+  // Countdown
+  const diff=Math.ceil((new Date('2027-01-07')-new Date())/86400000);
+  const el=document.getElementById('drest');
+  el.textContent=diff>0?diff:0;
+  if(diff<90) el.classList.add('cnt-danger');
+  else if(diff<180) el.classList.add('cnt-warn');
+  // Footer date
+  document.getElementById('hoy-footer').textContent=new Date().toLocaleDateString('es-PE',{day:'2-digit',month:'long',year:'numeric'});
+  // Set diasAlerta
+  const da=document.getElementById('cfg-da');if(da)da.value=ST.diasAlerta;
+  // Render everything
+  buildBars('bars-civiles',ACTS.filter(a=>a.sec==='PATIO DE LLAVES'));
+  buildBars('bars-electro',ACTS.filter(a=>a.sec==='OBRAS ELECTROMECANICAS'));
+  buildBars('bars-rp',ACTS.filter(a=>a.sec==='REDES PRIMARIAS'));
+  buildTblAct();
+  buildCurvaResumen();
+  buildCurvaFull();
+  buildTblCurva();
+  renderSum();renderRest();renderKPIs();
+}
+
+// ═══════════ PROGRESS BARS ═══════════
+function buildBars(id,acts){
+  const el=document.getElementById(id);if(!el)return;
+  el.innerHTML=acts.map(a=>`
+    <div class="pg">
+      <div class="ph">
+        <span class="pn" title="${a.n}">${a.n}</span>
+        <div class="pcomp">
+          <span class="pc ccont">C:${a.c}%</span>
+          <span class="pc cplan">P:${a.p}%</span>
+          <span class="pc creal">R:${a.r}%</span>
+        </div>
+      </div>
+      <div class="ptrack">
+        <div class="pbar" style="top:0;height:5px;width:${a.c}%;background:#e67e22;opacity:.6"></div>
+        <div class="pbar" style="top:5px;height:5px;width:${a.p}%;background:#2e6da4"></div>
+        <div class="pbar" style="top:10px;height:5px;width:${a.r}%;background:#1a7a4a"></div>
+      </div>
+    </div>`).join('');
+}
+
+// ═══════════ TABLA ACTIVIDADES ═══════════
+function buildTblAct(){
+  const tb=document.getElementById('tbody-act');
+  const secs=[...new Set(ACTS.map(a=>a.sec))];
+  let html='';
+  secs.forEach(sec=>{
+    html+=`<tr class="tbl-sec"><td colspan="8">${sec}</td></tr>`;
+    ACTS.filter(a=>a.sec===sec).forEach(a=>{
+      const d=(a.r-a.p).toFixed(1);
+      const bc=parseFloat(d)===0?'bneut':parseFloat(d)>0?'bok':'bdanger';
+      return html+=`<tr>
+        <td style="color:var(--text3);font-weight:600">${a.it}</td>
+        <td style="color:var(--text2);font-size:10px">${a.sec.length>18?a.sec.substring(0,18)+'…':a.sec}</td>
+        <td style="font-weight:500">${a.n}</td>
+        <td style="color:var(--warn);font-weight:600">${a.c}%</td>
+        <td style="color:var(--blue);font-weight:600">${a.p}%</td>
+        <td style="color:var(--green);font-weight:700">${a.r}%</td>
+        <td><span class="badge ${bc}">${parseFloat(d)>=0?'+':''}${d}%</span></td>
+        <td style="color:var(--text2);font-family:'DM Mono',monospace">$${a.v.toLocaleString()}</td>
+      </tr>`;
+    });
+  });
+  tb.innerHTML=html;
+}
+
+// ═══════════ CHARTS ═══════════
+const CHART_DEFAULTS={
+  font:{family:'Inter',size:10},
+  color:'#4a6080',
+  grid:'#dde5ef',
+  blue:'#2e6da4',green:'#1a7a4a',orange:'#b36a00',purple:'#9b59b6'
+};
+
+function buildCurvaResumen(){
+  const data=CS.slice(0,17);
+  const ctx=document.getElementById('cResumen').getContext('2d');
+  new Chart(ctx,{type:'line',data:{
+    labels:data.map(d=>d.s),
+    datasets:[
+      {label:'Planificado',data:data.map(d=>d.p),borderColor:CHART_DEFAULTS.blue,borderWidth:2,pointRadius:3,pointBackgroundColor:CHART_DEFAULTS.blue,fill:false,tension:.4},
+      {label:'Real',data:data.map(d=>d.r),borderColor:CHART_DEFAULTS.green,borderWidth:2.5,pointRadius:4,pointBackgroundColor:CHART_DEFAULTS.green,fill:{target:'origin',above:'rgba(26,122,74,0.08)'},tension:.4}
+    ]
+  },options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{labels:{color:CHART_DEFAULTS.color,font:{size:11,family:'Inter',weight:'500'}}},tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${c.parsed.y.toFixed(3)}%`},titleFont:{family:'Inter'},bodyFont:{family:'Inter'}}},
+    scales:{x:{ticks:{color:CHART_DEFAULTS.color,font:{size:9,family:'Inter'}},grid:{color:CHART_DEFAULTS.grid}},
+            y:{ticks:{color:CHART_DEFAULTS.color,font:{size:9,family:'Inter'},callback:v=>v+'%'},grid:{color:CHART_DEFAULTS.grid},min:0,max:10}}}});
+}
+
+function buildCurvaFull(){
+  const ctx=document.getElementById('cFull').getContext('2d');
+  new Chart(ctx,{type:'line',data:{
+    labels:CS.map(d=>d.s),
+    datasets:[
+      {label:'Planificado',data:CS.map(d=>d.p),borderColor:CHART_DEFAULTS.blue,borderWidth:2,pointRadius:0,fill:false,tension:.4},
+      {label:'Real (hasta S17)',data:CS.map((d,i)=>i<=16?d.r:null),borderColor:CHART_DEFAULTS.green,borderWidth:2.5,pointRadius:(_,i)=>i===16?6:0,fill:{target:'origin',above:'rgba(26,122,74,0.07)'},tension:.4},
+      {label:'Forecast (S17→Fin)',data:CS.map((d,i)=>i>=16?d.p:null),borderColor:CHART_DEFAULTS.purple,borderWidth:1.5,pointRadius:0,fill:false,tension:.4,borderDash:[6,4]}
+    ]
+  },options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{labels:{color:CHART_DEFAULTS.color,font:{size:11,family:'Inter',weight:'500'}}},tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${c.parsed.y!=null?c.parsed.y.toFixed(3)+'%':'—'}`},titleFont:{family:'Inter'},bodyFont:{family:'Inter'}}},
+    scales:{x:{ticks:{color:CHART_DEFAULTS.color,font:{size:8,family:'Inter'},maxRotation:55},grid:{color:CHART_DEFAULTS.grid}},
+            y:{ticks:{color:CHART_DEFAULTS.color,font:{size:9,family:'Inter'},callback:v=>v+'%'},grid:{color:CHART_DEFAULTS.grid},min:0,max:105}}}});
+}
+
+function buildTblCurva(){
+  const t=document.getElementById('tbl-curva');
+  let html=`<thead><tr><th>Semana</th><th>Fecha</th><th>Plan Acum. (%)</th><th>Real Acum. (%)</th><th>Diferencia</th></tr></thead><tbody>`;
+  CS.forEach((d,i)=>{
+    const delta=d.r!==null?(d.r-d.p).toFixed(3):'—';
+    const isHoy=i===16,isFc=i>16;
+    const bg=isHoy?'background:var(--skyblue)':'';
+    const dc=d.r!==null?(d.r>=d.p?'color:var(--green)':'color:var(--danger)'):'color:var(--text3)';
+    html+=`<tr style="${bg}">
+      <td style="font-weight:${isHoy?700:500};color:${isHoy?'var(--blue)':'var(--navy)'}">${d.s}${isHoy?' ◄ HOY':isFc?' (FC)':''}</td>
+      <td style="color:var(--text2);font-family:'DM Mono',monospace;font-size:11px">${d.d}</td>
+      <td style="color:var(--blue);font-weight:600;font-family:'DM Mono',monospace">${d.p.toFixed(3)}%</td>
+      <td style="color:${d.r!==null?'var(--green)':'var(--text3)'};font-weight:${d.r!==null?600:400};font-family:'DM Mono',monospace">${d.r!==null?d.r.toFixed(3)+'%':'—'}</td>
+      <td style="${dc};font-weight:600;font-family:'DM Mono',monospace">${delta!=='—'?(parseFloat(delta)>=0?'+':'')+delta+'%':delta}</td>
+    </tr>`;
+  });
+  t.innerHTML=html+'</tbody>';
+}
+
+// ═══════════ SUMINISTROS ═══════════
+function getAls(){
+  const hoy=new Date(),da=ST.diasAlerta||15;
+  return ST.suministros.filter(s=>{
+    if(s.estado==='Entregado')return false;
+    const fn=new Date(s.fechaNecesaria),fl=new Date(s.fechaLlegada);
+    if(isNaN(fn)||isNaN(fl))return false;
+    return fl>fn||(fn-hoy)/86400000<=da;
+  });
+}
+function renderSum(){
+  const tb=document.getElementById('tbody-sum');
+  const als=getAls();
+  const ac=document.getElementById('al-sum');
+  if(als.length>0){
+    ac.innerHTML=als.map(s=>{
+      const fn=new Date(s.fechaNecesaria),fl=new Date(s.fechaLlegada);
+      const diff=Math.round((fn-fl)/86400000),dias=Math.round((fn-new Date())/86400000);
+      return `<div class="abanner"><div style="font-size:18px;flex-shrink:0;margin-top:1px">⚠️</div><div>
+        <div class="atitle">ALERTA — ${s.descripcion}</div>
+        <div class="adesc">Proveedor: <strong>${s.proveedor}</strong> · Llegada estimada: ${fd(s.fechaLlegada)}</div>
+        <div class="adays">${diff<0?`Llegará ${Math.abs(diff)} días DESPUÉS de necesitarlo en obra`:`Quedan ${dias} días para necesitarlo`} · Necesario en obra: ${fd(s.fechaNecesaria)}</div>
+      </div></div>`;
+    }).join('');
+  }else{ac.innerHTML='';}
+  if(ST.suministros.length===0){
+    tb.innerHTML=`<tr><td colspan="8" style="text-align:center;color:var(--text2);padding:28px;background:var(--bg)">Sin suministros registrados. Agrega con "+ Nuevo Suministro".</td></tr>`;
+  }else{
+    tb.innerHTML=ST.suministros.map((s,i)=>{
+      const en=als.includes(s);
+      const fl=new Date(s.fechaLlegada),fn=new Date(s.fechaNecesaria);
+      const late=fl>fn&&s.estado!=='Entregado';
+      const eb=s.estado==='Entregado'?'bok':s.estado==='En tránsito'?'binfo':s.estado==='En aduana'?'bwarn':'bneut';
+      return `<tr style="${en?'background:var(--danger-bg)':''}">
+        <td style="color:var(--text3);font-weight:700">${i+1}</td>
+        <td style="font-weight:600;color:var(--navy)">${s.descripcion}</td>
+        <td style="color:var(--text2)">${s.proveedor}</td>
+        <td style="font-family:'DM Mono',monospace">${fd(s.fechaNecesaria)}</td>
+        <td style="color:${late?'var(--danger)':'var(--text)'};font-weight:${late?700:400};font-family:'DM Mono',monospace">${fd(s.fechaLlegada)}</td>
+        <td><span class="badge ${eb}">${s.estado}</span></td>
+        <td>${en?'<span class="badge bdanger">⚠ ALERTA</span>':'<span class="badge bok">✓ OK</span>'}</td>
+        <td><button class="bdel" onclick="delS(${i})">Eliminar</button></td>
+      </tr>`;
+    }).join('');
+  }
+  renderKPIs();syncAlRes();
+}
+function addSum(){
+  const desc=document.getElementById('s-desc').value.trim();
+  if(!desc){alert('Ingresa una descripción');return;}
+  ST.suministros.push({descripcion:desc,proveedor:document.getElementById('s-prov').value,fechaNecesaria:document.getElementById('s-fnec').value,fechaLlegada:document.getElementById('s-flleg').value,leadTime:document.getElementById('s-lt').value,estado:document.getElementById('s-est').value,obs:document.getElementById('s-obs').value});
+  saveST();closeM('mSum');renderSum();
+  ['s-desc','s-prov','s-fnec','s-flleg','s-lt','s-obs'].forEach(id=>document.getElementById(id).value='');
+}
+function delS(i){if(confirm('¿Eliminar este suministro?')){ST.suministros.splice(i,1);saveST();renderSum();}}
+
+// ═══════════ RESTRICCIONES ═══════════
+function renderRest(){
+  const cont=document.getElementById('rest-cont');
+  const crit=ST.restricciones.filter(r=>r.tipo==='critica'&&r.estado!=='cerrada').length;
+  const nc=ST.restricciones.filter(r=>r.tipo!=='critica'&&r.estado!=='cerrada').length;
+  const cerr=ST.restricciones.filter(r=>r.estado==='cerrada').length;
+  document.getElementById('rc-crit').textContent=crit;
+  document.getElementById('rc-nc').textContent=nc;
+  document.getElementById('rc-cerr').textContent=cerr;
+  document.getElementById('rc-tot').textContent=ST.restricciones.length;
+  if(ST.restricciones.length===0){cont.innerHTML=`<div style="color:var(--text2);text-align:center;padding:38px;background:var(--bg);border-radius:8px;font-size:12px">Sin restricciones. Haz clic en "+ Nueva Restricción".</div>`;return;}
+  const sorted=[...ST.restricciones].sort((a,b)=>{
+    if(a.estado==='cerrada'&&b.estado!=='cerrada')return 1;
+    if(a.estado!=='cerrada'&&b.estado==='cerrada')return -1;
+    return(a.tipo==='critica'?0:1)-(b.tipo==='critica'?0:1);
+  });
+  cont.innerHTML=sorted.map(r=>{
+    const idx=ST.restricciones.indexOf(r);
+    const eb=r.estado==='cerrada'?'bok':r.estado==='en-proceso'?'bwarn':'bdanger';
+    const lbl=r.estado==='cerrada'?'Cerrada':r.estado==='en-proceso'?'En Proceso':'Abierta';
+    return `<div class="rcard ${r.tipo==='critica'?'crit':r.estado==='cerrada'?'cerr':'nocrit'}">
+      <div class="rhdr">
+        <div>
+          <div class="rid">REST-${String(idx+1).padStart(3,'0')} · ${r.tipo==='critica'?'🔴 CRÍTICA':'🟡 NO CRÍTICA'}</div>
+          <div class="rtitle">${r.descripcion}</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-shrink:0;align-items:flex-start">
+          <span class="badge ${eb}">${lbl}</span>
+          <button class="bdel" onclick="delR(${idx})">✕</button>
+        </div>
+      </div>
+      <div class="rmeta">
+        <div class="rmi">👤 Responsable: <span>${r.responsable||'—'}</span></div>
+        <div class="rmi">📅 Fecha atención: <span>${r.fecha?fd(r.fecha):'—'}</span></div>
+      </div>
+      ${r.obs?`<div class="robs">📝 ${r.obs}</div>`:''}
+      <div style="display:flex;gap:7px;margin-top:10px">
+        ${r.estado!=='cerrada'?`<button class="btn bsec bsm" onclick="setR(${idx},'en-proceso')">Marcar en proceso</button>`:''}
+        ${r.estado!=='cerrada'?`<button class="btn bprimary bsm" onclick="setR(${idx},'cerrada')">✓ Cerrar restricción</button>`:''}
+      </div></div>`;
+  }).join('');
+  renderKPIs();
+}
+function addRest(){
+  const desc=document.getElementById('r-desc').value.trim();
+  if(!desc){alert('Ingresa una descripción');return;}
+  ST.restricciones.push({descripcion:desc,responsable:document.getElementById('r-resp').value,fecha:document.getElementById('r-fecha').value,tipo:document.getElementById('r-tipo').value,estado:document.getElementById('r-est').value,obs:document.getElementById('r-obs').value});
+  saveST();closeM('mRest');renderRest();
+  ['r-desc','r-resp','r-fecha','r-obs'].forEach(id=>document.getElementById(id).value='');
+}
+function delR(i){if(confirm('¿Eliminar esta restricción?')){ST.restricciones.splice(i,1);saveST();renderRest();}}
+function setR(i,e){ST.restricciones[i].estado=e;saveST();renderRest();}
+
+// ═══════════ KPIs + ALERTS ═══════════
+function renderKPIs(){
+  const al=getAls().length,ro=ST.restricciones.filter(r=>r.estado!=='cerrada').length;
+  document.getElementById('k-al').textContent=al;
+  document.getElementById('k-rest').textContent=ro;
+  document.getElementById('alertCount').textContent=al;
+}
+function syncAlRes(){
+  const als=getAls();
+  const cont=document.getElementById('al-res');if(!cont)return;
+  if(als.length===0){cont.innerHTML=`<div style="color:var(--green);font-size:12px;text-align:center;padding:16px;background:var(--green-bg);border-radius:7px;font-weight:600">✅ Sin alertas activas de suministros.</div>`;return;}
+  cont.innerHTML=als.slice(0,3).map(s=>{
+    const fn=new Date(s.fechaNecesaria),fl=new Date(s.fechaLlegada);
+    const diff=Math.round((fn-fl)/86400000),dias=Math.round((fn-new Date())/86400000);
+    return `<div class="abanner"><div style="font-size:18px;flex-shrink:0">📦</div><div>
+      <div class="atitle">${s.descripcion}</div>
+      <div class="adesc">Llegada estimada: ${fd(s.fechaLlegada)} · Necesario en obra: ${fd(s.fechaNecesaria)}</div>
+      <div class="adays">${diff<0?`Atraso estimado: ${Math.abs(diff)} días`:`${dias} días para necesitarlo`}</div>
+    </div></div>`;
+  }).join('');
+}
+
+// ═══════════ NAV / MODAL ═══════════
+function showTab(n,btn){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sec-'+n).classList.add('active');
+  if(btn)btn.classList.add('active');
+}
+function openM(id){document.getElementById(id).classList.add('open');}
+function closeM(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.movl').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
+
+function fd(ds){
+  if(!ds)return'—';
+  const d=new Date(ds+'T00:00:00');
+  if(isNaN(d))return ds;
+  return d.toLocaleDateString('es-PE',{day:'2-digit',month:'2-digit',year:'numeric'});
+}
+function expJSON(){
+  const exportData={CS:CS,ACTS:ACTS,restricciones:ST.restricciones,suministros:ST.suministros,diasAlerta:ST.diasAlerta};
+  const b=new Blob([JSON.stringify(exportData,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='data.json';a.click();
+}
+function impJSON(ev){
+  const f=ev.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=e=>{try{
+    const d=JSON.parse(e.target.result);
+    if(d.CS)CS=d.CS;
+    if(d.ACTS)ACTS=d.ACTS;
+    Object.assign(ST,{restricciones:d.restricciones||[],suministros:d.suministros||[],diasAlerta:d.diasAlerta||15});
+    saveST();renderSum();renderRest();
+    buildBars('bars-civiles',ACTS.filter(a=>a.sec==='PATIO DE LLAVES'));
+    buildBars('bars-electro',ACTS.filter(a=>a.sec==='OBRAS ELECTROMECANICAS'));
+    buildBars('bars-rp',ACTS.filter(a=>a.sec==='REDES PRIMARIAS'));
+    buildTblAct();buildCurvaResumen();buildCurvaFull();buildTblCurva();
+    alert('✅ Datos importados correctamente.');
+  }catch(ex){alert('Archivo JSON inválido.');}};
+  r.readAsText(f);
+}
+</script>
+</body>
+</html>
